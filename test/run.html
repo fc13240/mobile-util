@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <title>mobile-util测试</title>
+    <style type="text/css">
+    body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;}
+    </style>
+</head>
+<body>
+    <script type="text/javascript" src="../lib/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="../dist/output.js"></script>
+    <script type="text/javascript">
+    !function(){
+        try{
+            var util = Util;
+            var log = function(){
+                console.log.apply(console,arguments);
+            }
+            window.onerror = function(){
+                log('onerror',arguments)
+            }
+            util.alert = log;
+            /*util.alert*/
+            !function(){
+                // util.alert('hello');
+            }()
+            /*util.isOnline*/
+            !function(){
+                log('isOnline:',util.isOnline());
+            }()
+            /*util.Cache*/
+            !function(){
+                var Cache = util.Cache;
+                var cache_name = 'test';
+                log('get:',Cache.get(cache_name));
+                Cache.set(cache_name,'hello')
+                log('get1:',Cache.get(cache_name));
+                Cache.remove(cache_name);
+                log('get2:',Cache.get(cache_name));
+            }()
+
+            !function(){
+                var getJson = util.getJSON;
+                getJson('alksjdlfk',function(){
+                    log(arguments);
+                });
+                getJson('./data/test.json',function(data){
+                    log('data1',data);
+                });
+                getJson('http://10.14.85.116/mobile/mobile-util/test/data/test.json',function(data){
+                    log('data1',data);
+                });
+                // getJson('./data/sleep.php',function(data){
+                //     log('sleep',data);
+                // });
+                // getJson('./data/test.json',function(data){
+                //     log('data2',data);
+                // });
+
+            
+                
+                /*
+                从内存中读取和从浏览器缓存中读取性能对比
+                从内存中读取速度比从浏览器缓存中读取速度快
+                */
+                var num = num1 = 1000;
+                var startTime = +new Date();
+                //从浏览器缓存中读取
+                var fn = function(){
+                    getJson('./data/test.json',function(data){
+                        num--;
+                        if(num >=0 ){
+                            fn();
+                        }else{
+                            log('fn down',+new Date() - startTime);
+                            startTime = +new Date()
+                            fn1();
+                        }
+                    });
+                }
+                // 从内存直接读取
+                var fn1 = function(){
+                    getJson('./data/test.json',function(data){
+                        num1--;
+                        if(num1 >=0 ){
+                            fn1();
+                        }else{
+                            log('fn1 down',+new Date() - startTime);
+                        }
+                    },{
+                        cache: true
+                    });
+                }
+                fn();
+            }()
+        }catch(e){
+            console.log(e);
+        }
+    }()
+    </script>
+</body>
+</html>
